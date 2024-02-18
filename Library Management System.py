@@ -1,78 +1,82 @@
+import os
 class Library:
   def __init__(self):
+    if not os.path.exists("books.txt"):
+      open("books.txt", "w").close()  
     self.file = open("books.txt", "a+")
+      
+      
+  def list_books(self):
+    try:
+      self.file.seek(0)  
+      book_lines = self.file.read().splitlines()  
+      if len(book_lines) == 0:
+        print("No books found.")
+      else:
+        for line in book_lines:
+          book_info = line.split(",") 
+          book_name = book_info[0]
+          author = book_info[1]
+          print(f"Book Name: {book_name}, Author: {author}")
+    except Exception as e:
+      print(f"An error occurred: {str(e)}")
 
-  def list_of_books(self):
-    self.file.seek(0)
-    book_info = self.file.read().splitlines()
-    for book in book_info:
-      book_data = book.split(", ")
-      title = book_data[0]
-      author = book_data[1]
-      release_date = book_data[2]
-      number_of_pages = book_data[3]
-      print(f"Book Title: {title}, Author: {author}, Release Date: {release_date}, Pages: {number_of_pages}")
+  def add_book(self):
+    book_title = input("Enter the book title: ")
+    book_author = input("Enter the book author: ")
+    release_year = input("Enter the first release year: ")
+    num_pages = input("Enter the number of pages: ")
 
-  def add(self):
-    title = input("Enter the book title: ")
-    author = input("Enter the book author: ")
-    release_date = input("Enter the release date: ")
-    number_of_pages = input("Enter the number of pages: ")
-
-    book_info = f"{title}, {author}, {release_date}, {number_of_pages}\n"
+    book_info = f"{book_title},{book_author},{release_year},{num_pages}\n"
     self.file.write(book_info)
 
   def remove_book(self):
-    title = input("Enter the book title to remove: ")
+    book_title = input("Enter the book title to remove: ")
 
     
     self.file.seek(0)
-    book_info = self.file.read().splitlines()
+    book_lines = self.file.read().splitlines()
     books_list = []
-    for book in book_info:
-      book_data = book.split(", ")
-      books_list.append(book_data)
+    for line in book_lines:
+      book_info = line.split(",")
+      book_name = book_info[0]
+      books_list.append(book_name)
 
-    index = None
-    for i, book in enumerate(books_list):
-      if book[0] == title:
-        index = i
-        break
-    if index is not None:
-      books_list.pop(index)
-      print(f"Book '{title}' removed successfully.")
+    if book_title in books_list:
+      book_index = books_list.index(book_title)
+      del books_list[book_index]
+
+     
+      self.file.seek(0)
+      self.file.truncate()
+
+      
+      for book in books_list:
+        self.file.write(f"{book}\n")
+
+      print(f"Book '{book_title}' has been removed.")
     else:
-      print(f"Book '{title}' not found.")
+      print(f"Book '{book_title}' not found.")
 
-    self.file.seek(0)
-    self.file.truncate(0)
+def menu():
+  lib = Library()
+  while True:
+      print("*** MENU ***")
+      print("1) List Books")
+      print("2) Add Book")
+      print("3) Remove Book")
+      print("4) Quit")
 
-    for book in books_list:
-      book_info = ", ".join(book) + "\n"
-      self.file.write(book_info)
+      choice = input("Enter your choice: ")
+      if choice == "1":
+        lib.list_books()
+      elif choice == "2":
+        lib.add_book()
+      elif choice == "3":
+        lib.remove_book()
+      elif choice == "4":
+        break
+      else:
+        print("Invalid choice")
 
-  def __del__(self):
-    self.file.close()
-
-
-lib = Library()
-
-while True:
-  print("*** MENU ***")
-  print("1) List Books")
-  print("2) Add Book")
-  print("3) Remove Book")
-  print("4) Quit (q)")
-
-  choice = input("Enter your choice (1-4): ")
-  if choice == "4" or choice.lower() == "q":
-    print("You have exited the program")
-    break
-  if choice == "1":
-    lib.list_of_books()
-  elif choice == "2":
-    lib.add()
-  elif choice == "3":
-    lib.remove_book()
-  else:
-    print("Invalid choice. Please try again.")
+menu()
