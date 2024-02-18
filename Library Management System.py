@@ -8,16 +8,17 @@ class Library:
       
   def list_books(self):
     try:
-      self.file.seek(0)  
-      book_lines = self.file.read().splitlines()  
+      self.file.seek(0)
+      book_lines = self.file.read().splitlines()
       if len(book_lines) == 0:
         print("No books found.")
       else:
         for line in book_lines:
-          book_info = line.split(",") 
-          book_name = book_info[0]
-          author = book_info[1]
-          print(f"Book Name: {book_name}, Author: {author}")
+          book_info = line.split(",")
+          if len(book_info) >= 2:  # Check if book_info has at least 2 elements
+            book_name = book_info[0]
+            author = book_info[1]
+            print(f"Book Name: {book_name}, Author: {author}")
     except Exception as e:
       print(f"An error occurred: {str(e)}")
 
@@ -75,6 +76,7 @@ def menu():
       elif choice == "3":
         lib.remove_book()
       elif choice == "4":
+        print("Goodbye!")
         break
       else:
         print("Invalid choice")
